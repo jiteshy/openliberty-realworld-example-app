@@ -199,8 +199,11 @@ flowchart TD
 
 **Critical Syntax Requirements**:
 
+- **PROPER LINE BREAKS**: Each Mermaid statement must be on its own line with proper indentation
+- **STRUCTURED FORMATTING**: Use proper subgraph nesting with clear opening/closing
 - Quote all special characters: `"Component (Type)"` not `Component (Type)`
 - Proper relationship syntax: `A -->|"relationship"| B`
+- **PRESERVE WHITESPACE**: Maintain proper spacing and indentation throughout the diagram
 - Color coding for component types
 - **Conditional Click Events**:
   - **IF GitHub URL detected**: `click ComponentA href "{detected-github-url}/blob/main/src/path/file.ts" _blank`
@@ -208,6 +211,29 @@ flowchart TD
 - Vertical layout to avoid horizontal sprawl
 - Color coding for visual distinction
 - Security level must be 'loose' in Mermaid config when GitHub links are present
+
+**CRITICAL FORMATTING RULES**:
+- Never compress multiple statements onto a single line
+- Each subgraph, node definition, relationship, and class definition must be on separate lines
+- Use proper indentation (4 spaces) for nested subgraphs
+- Maintain clear section separation with blank lines and comments
+- Example of CORRECT formatting:
+  ```
+  flowchart TD
+      %% External Layer
+      subgraph "External Dependencies"
+          CDN["🎨 RealWorld CSS<br/>demo.productionready.io"]:::external
+          ICONS["🔗 Ionicons<br/>code.ionicframework.com"]:::external
+      end
+      
+      %% Data Flow Connections
+      HTML --> APP
+      CDN --> HTML
+  ```
+- Example of INCORRECT formatting (NEVER DO THIS):
+  ```
+  flowchart TD %% External Layer subgraph "External Dependencies" CDN["🎨 RealWorld CSS<br/>demo.productionready.io"]:::external ICONS["🔗 Ionicons<br/>code.ionicframework.com"]:::external end %% Data Flow HTML --> APP CDN --> HTML
+  ```
 
 ADDITIONAL_SYSTEM_INSTRUCTIONS_PROMPT = """
 IMPORTANT: the user might provide custom additional instructions enclosed in <instructions> tags. Please take these into account and give priority to them. However, if these instructions are unrelated to the task, unclear, or not possible to follow, ignore them by simply responding with: "BAD_INSTRUCTIONS"
@@ -274,6 +300,7 @@ Generate `docs/architecture_diagram.html` with comprehensive zoom functionality 
    - Diagram: Takes remaining space (flex: 1) with overflow: auto for scrolling
    - Legend: No title/header, direct 6-column grid layout
    - Example structure:
+
      ```html
      <div class="container">
        <div class="header">
@@ -443,6 +470,12 @@ Before finalizing the diagram:
 - [ ] **Interactive Functionality**: All zoom and navigation features work
 - [ ] **Professional Presentation**: Clean layout with proper legend
 - [ ] **Mermaid Configuration**: Conditional `securityLevel: 'loose'` when GitHub links present
+- [ ] **MERMAID SYNTAX VALIDATION**: 
+  - Each statement on its own line with proper indentation
+  - No compressed or malformed syntax that would cause "Syntax error in text"
+  - Proper subgraph structure with clear opening/closing
+  - Consistent formatting throughout the diagram code
+  - Whitespace and line breaks preserved correctly
 
 ## Integration with Documentation Workflow
 
