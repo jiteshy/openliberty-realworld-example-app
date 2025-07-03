@@ -2,570 +2,625 @@
 
 ## 1. Project Overview
 
-**Purpose**: A fully featured backend REST API service implementing the RealWorld specification for a blogging platform similar to Medium.
+**Purpose**: A comprehensive backend REST API service implementing the RealWorld specification for a social blogging platform similar to Medium.
 
-**Domain**: Social blogging platform serving content creators and readers who want to publish, discover, and interact with articles.
+**Domain**: Social content publishing platform serving writers, readers, and content consumers who want to create, discover, and engage with articles and authors.
 
 **Target Users**: 
-- Content creators who write and publish articles
+- Content creators who write and publish articles with tags
 - Readers who discover, favorite, and comment on articles
-- Developers who follow and interact with other users
+- Social users who follow authors and build personalized content feeds
 
-**Core Value Proposition**: Provides a complete, production-ready backend implementation demonstrating real-world patterns including CRUD operations, authentication, authorization, social features, and advanced database relationships.
+**Core Value Proposition**: Provides a production-ready, fully-featured backend implementation demonstrating real-world enterprise patterns including CRUD operations, JWT authentication, role-based authorization, social features, and complex database relationships using modern Java technologies.
 
 ## 2. Functional Documentation
 
 ### 2.1 Feature Inventory
 
-**User Management**
-- User role: Any registered user
-- Primary use case: Account management and authentication
+**User Authentication & Management**
+- User role: Any visitor (registration), Authenticated users (management)
+- Primary use case: Account lifecycle and security management
 - Key user flows:
-  1. Register with email, username, and password
-  2. Login with email and password to receive JWT token
-  3. Update profile information (email, username, bio, image, password)
-  4. View current user profile with authentication status
+  1. Register new account with email, username, password
+  2. Login with credentials to receive JWT token
+  3. Update profile information (bio, image, email, password)
+  4. Retrieve current user profile and authentication status
 
-**Article Management**
+**Article Content Management**
 - User role: Authenticated users (authors)
-- Primary use case: Content creation and management
+- Primary use case: Content creation and lifecycle management
 - Key user flows:
-  1. Create new article with title, description, body, and optional tags
-  2. Update existing articles (author only)
-  3. Delete articles (author only)
-  4. View individual articles by slug
+  1. Create articles with title, description, body content, and tags
+  2. Update existing articles (author-only permissions)
+  3. Delete articles (author-only permissions)
+  4. Generate unique URL slugs automatically from article titles
 
-**Article Discovery**
+**Content Discovery & Browsing**
 - User role: Any user (authenticated or anonymous)
-- Primary use case: Content discovery and filtering
+- Primary use case: Content exploration and consumption
 - Key user flows:
-  1. List all articles with pagination (limit/offset)
-  2. Filter articles by tag, author, or favorited user
-  3. Get personalized feed of articles from followed users (authenticated only)
+  1. Browse all articles with pagination support
+  2. Filter articles by tag, author, or favorited status
+  3. Access personalized feed of articles from followed authors
+  4. View individual articles by unique slug identifier
 
-**Social Features**
+**Social Engagement Features**
 - User role: Authenticated users
-- Primary use case: Social interaction and engagement
+- Primary use case: Community interaction and content curation
 - Key user flows:
-  1. Follow/unfollow other users
-  2. Favorite/unfavorite articles
-  3. View user profiles and following status
+  1. Follow and unfollow other authors
+  2. Favorite and unfavorite articles for bookmarking
+  3. View public user profiles with following status
+  4. Build personalized feeds based on followed authors
 
-**Commenting System**
-- User role: Authenticated users
-- Primary use case: Article discussion and engagement
+**Article Discussion System**
+- User role: Authenticated users for creation, Any user for viewing
+- Primary use case: Community engagement and article feedback
 - Key user flows:
-  1. Add comments to articles
-  2. Delete own comments
-  3. View all comments on an article
+  1. Add comments to articles with structured discussion
+  2. Delete own comments (author-only permissions)
+  3. View all comments on articles in threaded format
 
 **Content Organization**
 - User role: Any user
-- Primary use case: Content categorization and discovery
+- Primary use case: Content categorization and discoverability
 - Key user flows:
-  1. View all available tags in the system
+  1. View comprehensive list of all available tags in the system
 
 ### 2.2 User Journey Maps
 
-**Authentication Flow**:
-1. User registers with email/username/password → Receives JWT token
-2. User logs in with email/password → Receives JWT token
-3. User includes JWT token in Authorization header as "Token {jwt}"
-4. Server validates JWT for protected endpoints
+**Authentication & Onboarding Flow**:
+1. New user registers with email/username/password → System validates uniqueness and creates account → JWT token generated and returned
+2. Returning user logs in with email/password → System validates credentials → JWT token generated for session
+3. Authenticated user includes JWT token in Authorization header as "Token {jwt}" → Server validates token and extracts user claims
+4. Protected endpoints verify JWT and user permissions before processing requests
 
-**Core Content Workflow**:
-1. User authenticates and receives token
-2. User creates article with title, description, body, tags
-3. System generates unique slug from title
-4. Article becomes discoverable in public listings
-5. Other users can favorite, comment, or follow the author
+**Content Creation & Publishing Workflow**:
+1. Authenticated user creates article with metadata → System validates required fields and generates unique slug
+2. Article becomes immediately available in public listings and discoverable by filters
+3. Other users can engage through favorites, comments, and author following
+4. Author retains exclusive edit/delete permissions for content lifecycle management
 
-**Social Interaction Flow**:
-1. User discovers articles through listing or feed
-2. User can favorite articles to bookmark them
-3. User can follow article authors
-4. User's feed shows articles from followed authors
-5. User can comment on articles for discussion
+**Social Discovery & Engagement Flow**:
+1. Users discover content through public article listings, tag filtering, or personalized feeds
+2. Users can favorite articles for personal bookmarking and follow authors for ongoing content
+3. Following relationships populate personalized feeds with articles from followed authors
+4. Comment system enables structured discussions and community engagement around articles
 
 ### 2.3 Business Logic Rules
 
-**Data Validation Rules**:
-- User registration requires non-empty email, username, and password
-- Email must be unique across all users
-- Username must be unique across all users
-- Article creation requires non-empty title, description, and body
-- Article slugs must be unique (generated from title)
+**Data Validation & Integrity Rules**:
+- User registration requires non-empty email, username, and password fields
+- Email addresses must be unique across all users in the system
+- Usernames must be unique across all users in the system
+- Article creation requires non-empty title, description, and body content
+- Article slugs must be unique system-wide (auto-generated from titles with conflict resolution)
 
-**Business Constraints**:
-- Only article authors can update or delete their articles
-- Only comment authors can delete their comments
-- Users cannot favorite their own articles (not enforced in code)
-- Article feed only shows articles from followed users
+**Authorization & Permissions Constraints**:
+- Only article authors can update or delete their own articles
+- Only comment authors can delete their own comments
+- Article favoriting and following actions require user authentication
+- User profile updates restricted to account owner only
+- Personalized feeds available only to authenticated users
 
-**Workflow Dependencies**:
-- Article creation requires authenticated user
-- Comments require existing article
-- Following requires existing target user
-- Favoriting requires existing article
+**Content & Workflow Dependencies**:
+- Article creation and management requires valid user authentication
+- Comment creation requires both valid authentication and existing target article
+- User following requires valid target user existence in system
+- Article favoriting requires valid target article existence in system
+- Feed generation depends on established following relationships
 
-**Integration Points**:
-- Derby embedded database for data persistence
-- JWT token generation and validation
-- Slug generation using GitHub Slugify library
+**External System Integration Points**:
+- Derby embedded database for all persistent data storage and retrieval
+- JWT token generation and validation for stateless authentication
+- GitHub Slugify library for consistent URL slug generation from article titles
+- Jersey JAX-RS implementation for REST API processing and JSON serialization
 
 ## 3. Technical Documentation
 
 ### 3.1 Architecture Overview
 
 **Technology Stack**:
-- Java 8
-- Open Liberty 20.0.0.4
-- MicroProfile 3.0 (includes Health, JWT, and other specifications)
-- JAX-RS 2.0.1 with Jersey 2.30.1 implementation
-- JPA 2.2 features with javax.persistence 2.1.0 API compatibility
-- Derby 10.14.2.0 embedded database (development and test)
-- JWT 1.0 for authentication
-- Maven for build management
-- JSON processing with org.json library
+- Java 8 with Maven 3.x for build management and dependency resolution
+- Open Liberty 20.0.0.4 application server with MicroProfile 3.0 specifications
+- JAX-RS 2.0.1 with Jersey 2.30.1 implementation providing REST API services, JSON binding, client framework, and HK2 dependency injection
+- JPA 2.2 features with EclipseLink ORM and javax.persistence 2.1.0 API (Liberty provides 2.2 runtime capabilities through 2.1.0 API compatibility)
+- Derby 10.14.2.0 embedded database with test scope dependency that is copied to Liberty shared resources for both development runtime and test execution environments
+- MicroProfile JWT 1.0 for stateless authentication and authorization
+- JSON processing with org.json library for request/response serialization
 
 **Project Structure**:
 ```
 src/main/java/
 ├── application/
-│   ├── errors/          # Validation error messages
-│   └── rest/            # JAX-RS REST endpoints
-├── core/                # Domain models and DTOs
-│   ├── article/         # Article entities
-│   ├── comments/        # Comment entities
-│   └── user/           # User entities and profiles
-├── dao/                # Data Access Objects
-└── security/           # JWT token generation
+│   ├── errors/          # Centralized validation error messages and formatting
+│   └── rest/            # JAX-RS REST endpoint implementations
+├── core/                # Domain models, entities, and data transfer objects
+│   ├── article/         # Article-related entities and DTOs
+│   ├── comments/        # Comment entities and creation DTOs
+│   └── user/           # User entities, profiles, and DTOs
+├── dao/                # Data Access Objects for database operations
+└── security/           # JWT token generation and security utilities
 ```
 
-**Design Patterns**:
-- **Layered Architecture**: Clear separation between REST, business logic, and data access layers
-- **Data Access Object (DAO)**: Centralized database operations in UserDao and ArticleDao
-- **Request-Response DTOs**: CreateUser, CreateArticle, CreateComment for API requests
-- **Entity-JSON Serialization**: Custom toJson() methods for API responses
+**Design Patterns & Architecture**:
+- **Layered Architecture**: Clear separation between REST controllers, business logic, and data access layers
+- **Data Access Object (DAO) Pattern**: Centralized database operations in specialized DAO classes (UserDao, ArticleDao)
+- **Request-Response DTO Pattern**: Dedicated data transfer objects (CreateUser, CreateArticle, CreateComment) for API boundaries
+- **Entity-JSON Serialization**: Custom toJson() methods on entities for consistent API response formatting
+- **Dependency Injection**: CDI-based injection for service and DAO layer dependencies
 
-**Data Flow**:
-1. JAX-RS endpoint receives HTTP request
-2. Request deserialized to DTO objects
-3. JWT token validated for authentication
-4. DAO layer performs database operations
-5. Entity objects converted to JSON responses
-6. HTTP response returned to client
+**Data Flow Architecture**:
+1. HTTP requests received by JAX-RS endpoints with automatic JSON deserialization to DTO objects
+2. JWT tokens validated for authentication and user identity extraction
+3. Business logic processed in DAO layer with transaction management
+4. JPA entities queried, created, or updated through EntityManager operations
+5. Entity objects converted to JSON responses through custom serialization methods
+6. HTTP responses returned to clients with appropriate status codes and error handling
 
 ### 3.2 Development Environment
 
 **Prerequisites**:
-- Java 8 JDK
-- Maven 3.x
-- Open Liberty runtime (handled by Maven plugin)
+- Java 8 JDK (minimum requirement for compilation and runtime)
+- Maven 3.x for dependency management and build execution
+- Open Liberty runtime automatically managed through Maven plugin
 
 **Installation Steps**:
-1. Clone the repository
-2. Navigate to project root directory
-3. Run `mvn clean install` to build the project
-4. Run `mvn liberty:start` to start the server
-5. Server will be available at `http://localhost:9080`
+1. Clone the repository from GitHub source
+2. Navigate to the project root directory in terminal
+3. Execute `mvn clean install` to download dependencies and build the project
+4. Run `mvn liberty:start` to start the server in background mode
+5. Application becomes available at `http://localhost:9080` with API base at `/api`
 
-**Configuration**:
-- Server configuration: `src/main/liberty/config/server.xml`
-- Database configuration: Derby embedded database (UserDB) - serves both development runtime and test environments
-- JWT configuration: MicroProfile JWT with hardcoded issuer (requires environment-specific configuration)
-- CORS configuration: Allows `http://localhost:4100` origin
+**Configuration Management**:
+- Server configuration: `src/main/liberty/config/server.xml` (Liberty features, datasources, security)
+- Database configuration: Derby embedded database (UserDB) serving both development runtime and test environments
+- JWT configuration: MicroProfile JWT with hardcoded issuer requiring environment-specific updates
+- CORS configuration: Explicitly allows `http://localhost:4100` origin for frontend integration
+- Build configuration: Maven POM with Liberty plugin, dependency management, and test execution
 
-**Common Commands**:
-- **Build**: `mvn clean install`
-- **Start server**: `mvn liberty:start`
-- **Run server in foreground**: `mvn liberty:run`
-- **Stop server**: `mvn liberty:stop`
-- **Run tests**: `mvn test`
-- **Run integration tests**: `mvn integration-test`
-- **Package WAR**: `mvn package`
+**Development Commands**:
+- **Build Project**: `mvn clean install` (full build with dependency resolution and testing)
+- **Start Server**: `mvn liberty:start` (background server process)
+- **Run Server**: `mvn liberty:run` (foreground server with console output)
+- **Stop Server**: `mvn liberty:stop` (graceful shutdown of background server)
+- **Execute Tests**: `mvn test` (unit test execution)
+- **Integration Tests**: `mvn integration-test` (full integration test suite)
+- **Package WAR**: `mvn package` (create deployable WAR artifact)
 
 ### 3.3 Code Organization
 
-**Directory Structure**:
-- **`application/rest/`**: JAX-RS REST endpoint classes
-- **`core/`**: Domain models, entities, and data transfer objects
-- **`dao/`**: Data access layer with database operations
-- **`security/`**: JWT token generation and validation
-- **`src/main/liberty/config/`**: Open Liberty server configuration
-- **`src/main/resources/META-INF/`**: JPA persistence configuration
+**Directory Structure & Responsibilities**:
+- **`application/rest/`**: JAX-RS REST endpoint implementations with HTTP method handlers
+- **`core/`**: Domain models, JPA entities, and data transfer objects for API boundaries
+- **`dao/`**: Data access layer with EntityManager operations and custom queries
+- **`security/`**: JWT token generation, validation, and security utility classes
+- **`src/main/liberty/config/`**: Open Liberty server configuration and feature definitions
+- **`src/main/resources/META-INF/`**: JPA persistence configuration and database connection settings
 
 **File Naming Conventions**:
-- `*API.java` for REST endpoint classes (UsersAPI, ArticlesAPI)
-- `*Dao.java` for Data Access Objects (UserDao, ArticleDao)
-- `Create*.java` for request DTOs (CreateUser, CreateArticle)
-- Entity classes use domain names (User, Article, Comment)
+- **`*API.java`**: JAX-RS REST endpoint controllers (UsersAPI, ArticlesAPI, ProfilesAPI, TagsAPI)
+- **`*.java`**: Domain entities and core business objects (User, Article, Comment, Profile)
+- **`Create*.java`**: Data transfer objects for request payloads (CreateUser, CreateArticle, CreateComment)
+- **`*Dao.java`**: Data access objects for database operations (UserDao, ArticleDao)
+- **`*IT.java`**: Integration test classes (EndpointIT)
 
-**Import/Export Patterns**:
-- CDI `@Inject` for dependency injection
-- JPA entities for database mapping
-- JAX-RS annotations for REST endpoint definitions
-- MicroProfile JWT for token handling
+**Import Organization & Dependencies**:
+- Standard Java libraries (javax.* packages for JAX-RS, JPA, CDI)
+- MicroProfile specifications (org.eclipse.microprofile.jwt)
+- Open Liberty specific classes (com.ibm.websphere.security.jwt)
+- Third-party libraries (org.json for JSON processing, com.github.slugify for URL generation)
+- Application internal dependencies following package hierarchy
 
-**State Management**:
-- Database persistence through JPA entities
-- Stateless REST endpoints with `@RequestScoped`
-- JWT tokens for user session management
+**Module Architecture & Connections**:
+- **REST Layer**: JAX-RS endpoints inject DAO and security components via CDI
+- **DAO Layer**: Handles all database operations with JPA EntityManager injection
+- **Entity Layer**: JPA entities with custom JSON serialization methods
+- **Security Layer**: JWT token generation and validation utilities
+- **Error Handling**: Centralized validation message formatting and HTTP status management
 
 ### 3.4 API Documentation
 
-**Base URL**: `http://localhost:9080/api`
+**Authentication Mechanism**:
+- **JWT Token-based Authentication**: MicroProfile JWT 1.0 with stateless token validation
+- **Authorization Header Format**: `Authorization: Token {jwt_token}`
+- **Token Generation**: Custom JwtGenerator class creates tokens with user ID and username claims
+- **Protected Endpoints**: Most endpoints require `@RolesAllowed("users")` with specific exceptions for public access
 
-**Authentication**: 
-- JWT tokens using Authorization header: `Authorization: Token {jwt}`
-- Tokens obtained from `/api/users` (register) or `/api/users/login` endpoints
-- Protected endpoints require `@RolesAllowed("users")` annotation
+**REST API Endpoint Specification**:
 
-**Endpoints**:
+**User Management Endpoints**:
+- `POST /api/users` - User registration (public access)
+  - Request: `{"user": {"username": "string", "email": "string", "password": "string"}}`
+  - Response: User object with JWT token
+  - Validation: Username and email uniqueness, required field validation
 
-**User Management**:
-- `POST /api/users` - User registration (public)
-- `POST /api/users/login` - User login (public)
-- `GET /api/user` - Get current user (authenticated)
+- `POST /api/users/login` - User authentication (public access)
+  - Request: `{"user": {"email": "string", "password": "string"}}`
+  - Response: User object with JWT token
+  - Validation: Credential verification, email existence
+
+- `GET /api/user` - Current user profile (authenticated)
+  - Response: Current user profile with token refresh
+  - Authorization: JWT token required
+
 - `PUT /api/user` - Update user profile (authenticated)
+  - Request: `{"user": {"email": "string", "username": "string", "bio": "string", "image": "string"}}`
+  - Response: Updated user object with refreshed token
+  - Authorization: User can only update own profile
 
-**Profile Management**:
-- `GET /api/profiles/{username}` - Get user profile (public)
-- `POST /api/profiles/{username}/follow` - Follow user (authenticated)
-- `DELETE /api/profiles/{username}/follow` - Unfollow user (authenticated)
+**Article Management Endpoints**:
+- `GET /api/articles` - List articles with filtering (public access)
+  - Query Parameters: `tag`, `author`, `favorited`, `limit` (default: 20), `offset` (default: 0)
+  - Response: Array of articles with metadata and pagination info
+  - Features: Tag-based filtering, author filtering, favorited-by filtering
 
-**Article Management**:
-- `GET /api/articles` - List articles with filtering (public)
-- `GET /api/articles/feed` - Get personalized feed (authenticated)
-- `GET /api/articles/{slug}` - Get single article (public)
-- `POST /api/articles` - Create article (authenticated)
-- `PUT /api/articles/{slug}` - Update article (authenticated, author only)
-- `DELETE /api/articles/{slug}` - Delete article (authenticated, author only)
+- `GET /api/articles/feed` - Personalized article feed (authenticated)
+  - Query Parameters: `limit` (default: 20), `offset` (default: 0)
+  - Response: Articles from followed authors with pagination
+  - Authorization: JWT token required for feed generation
 
-**Article Engagement**:
+- `GET /api/articles/{slug}` - Single article retrieval (public access)
+  - Response: Complete article object with author profile and engagement data
+  - URL Parameter: Article slug (auto-generated from title)
+
+- `POST /api/articles` - Create new article (authenticated)
+  - Request: `{"article": {"title": "string", "description": "string", "body": "string", "tagList": ["string"]}}`
+  - Response: Created article with generated slug and metadata
+  - Authorization: JWT token required, auto-assignment of author
+
+- `PUT /api/articles/{slug}` - Update article (authenticated, author-only)
+  - Request: `{"article": {"title": "string", "description": "string", "body": "string"}}`
+  - Response: Updated article with refreshed slug if title changed
+  - Authorization: Only article author can update
+
+- `DELETE /api/articles/{slug}` - Delete article (authenticated, author-only)
+  - Response: Empty response with 200 status
+  - Authorization: Only article author can delete
+
+**Article Engagement Endpoints**:
 - `POST /api/articles/{slug}/favorite` - Favorite article (authenticated)
+  - Response: Article object with updated favorites count
+  - Authorization: JWT token required
+
 - `DELETE /api/articles/{slug}/favorite` - Unfavorite article (authenticated)
+  - Response: Article object with updated favorites count
+  - Authorization: JWT token required
 
-**Comments**:
-- `GET /api/articles/{slug}/comments` - Get article comments (public)
+**Comment System Endpoints**:
+- `GET /api/articles/{slug}/comments` - List article comments (public access)
+  - Response: Array of comments with author information
+  - Features: Comments include author profiles and timestamps
+
 - `POST /api/articles/{slug}/comments` - Add comment (authenticated)
-- `DELETE /api/articles/{slug}/comments/{id}` - Delete comment (authenticated, author only)
+  - Request: `{"comment": {"body": "string"}}`
+  - Response: Created comment object with author profile
+  - Authorization: JWT token required
 
-**Tags**:
-- `GET /api/tags` - Get all tags (public)
+- `DELETE /api/articles/{slug}/comments/{id}` - Delete comment (authenticated, author-only)
+  - Response: Empty response with 200 status
+  - Authorization: Only comment author can delete
 
-**Health Monitoring**:
-- `GET /health` - MicroProfile Health endpoint (public)
-  - Returns JSON status with service availability
-  - Used for health checks and monitoring
+**Profile & Social Endpoints**:
+- Profile endpoints implemented in ProfilesAPI (following/unfollowing functionality)
+- Tag listing endpoint in TagsAPI for content categorization
 
-**Data Models**:
+**Health Monitoring Endpoints**:
+- `GET /health` - MicroProfile Health endpoint returning service status with UP/DOWN state (public access)
+  - Implemented via `HealthEndpoint.java` class implementing MicroProfile `HealthCheck` interface
+  - Auto-registered by MicroProfile 3.0 feature for application health monitoring
+  - Returns JSON response with service availability status for load balancer integration
 
-**User Registration/Login**:
+**Error Response Format**:
+- Standard HTTP status codes: 200 (success), 201 (created), 404 (not found), 422 (validation error), 403 (forbidden)
+- Consistent error response structure with validation messages
+- Centralized error handling through ValidationMessages utility class
+
+**Data Model Schemas**:
+
+**User Entity Structure**:
 ```json
 {
   "user": {
-    "email": "user@example.com",
-    "username": "username",
-    "password": "password"
+    "email": "string",
+    "username": "string", 
+    "bio": "string|null",
+    "image": "string|null",
+    "token": "jwt_string"
   }
 }
 ```
 
-**Article Creation**:
+**Article Entity Structure**:
 ```json
 {
   "article": {
-    "title": "Article Title",
-    "description": "Article description",
-    "body": "Article content",
-    "tagList": ["tag1", "tag2"]
+    "slug": "string",
+    "title": "string",
+    "description": "string", 
+    "body": "string",
+    "tagList": ["string"],
+    "createdAt": "ISO_datetime",
+    "updatedAt": "ISO_datetime",
+    "favoritesCount": "integer",
+    "favorited": "boolean",
+    "author": "profile_object"
   }
 }
 ```
-
-**Comment Creation**:
-```json
-{
-  "comment": {
-    "body": "Comment text"
-  }
-}
-```
-
-**Error Handling**:
-- **422 Unprocessable Entity**: Validation errors, duplicate data
-- **404 Not Found**: Resource not found
-- **403 Forbidden**: Insufficient permissions
-- **401 Unauthorized**: Authentication required
-
-**Error Response Format**:
-```json
-{
-  "errors": {
-    "body": ["error message"]
-  }
-}
-```
-
-**Rate Limiting**: Not implemented
-**API Versioning**: Not implemented
 
 ### 3.5 Data Management
 
-**Database Schema**:
-- **USER_TABLE**: User accounts with authentication and profile data
-- **Article_Table**: Articles with content, metadata, and author relationships
-- **Comments**: Article comments with author relationships
-- **FOLLOWED_BY**: Many-to-many relationship for user following
-- **Favorited Articles**: One-to-many relationship for user favorites
+**Database Schema & Design**:
+- **Primary Database**: Derby 10.14.2.0 embedded database with automatic table creation
+- **Persistence Framework**: JPA 2.2 with EclipseLink ORM for entity management
+- **Connection Management**: JTA datasource configured in Liberty server with automatic connection pooling
+- **Schema Generation**: EclipseLink DDL generation creates tables automatically from entity annotations
 
-**Core Entities**:
-- **User**: email, username, password, bio, image, followers, favorites
-- **Article**: slug, title, description, body, tags, timestamps, author, favorites count
-- **Comment**: body, timestamps, author, article relationship
-- **Profile**: Separate JPA entity for public user profile display (related to User)
-
-**Migration Strategy**: 
-- EclipseLink DDL generation with `create-tables` strategy
-- Database schema created automatically on startup
-- No explicit migration files (development setup)
+**Core Entity Relationships**:
+- **User → Article**: One-to-many relationship through Profile entity serving as author
+- **Article → Comment**: One-to-many relationship with cascade delete operations
+- **User ↔ User**: Following relationships for social feed generation
+- **User ↔ Article**: Favoriting relationships for bookmark functionality
 
 **Data Access Patterns**:
-- JPA Entity Manager for database operations
-- Custom DAO classes for complex queries
-- CDI injection for database resource management
-- Transaction boundaries using `@Transactional`
+- **Repository Pattern**: DAO classes (UserDao, ArticleDao) encapsulate all database operations
+- **Entity Manager Integration**: CDI injection of EntityManager for JPA operations
+- **Transaction Management**: Method-level `@Transactional` annotations for atomic operations
+- **Custom Query Implementation**: JPQL queries for complex filtering and relationship traversal
 
-**Caching Strategy**: No caching implemented
+**Data Validation & Constraints**:
+- **Entity-Level Validation**: JPA annotations for null constraints and column specifications
+- **Business Logic Validation**: Custom validation in API endpoints for business rules
+- **Unique Constraint Enforcement**: Email and username uniqueness validation at application level
+- **Referential Integrity**: JPA cascade operations for related entity management
 
-**Data Validation**:
-- Bean validation for required fields (manual checks in API layer)
-- Unique constraints on email and username
-- Database-level constraints through JPA annotations
-- Article slug uniqueness validation
+**Database Configuration**:
+- **Maven Dependency**: Derby defined with `test` scope in pom.xml but copied to Liberty shared resources during build
+- **Runtime Configuration**: Derby JDBC driver configured in server.xml with embedded database properties
+```xml
+<dataSource id="RealWorldSource" jndiName="jdbc/RealWorldSource">
+    <jdbcDriver libraryRef="derbyJDBCLib" />
+    <properties.derby.embedded databaseName="UserDB" createDatabase="create" />
+</dataSource>
+```
+- **Build Integration**: Maven dependency plugin copies Derby JAR to `target/liberty/wlp/usr/shared/resources/` for runtime access
+
+**Migration Strategy**: 
+- EclipseLink automatic DDL generation handles schema creation and updates
+- Database file persisted locally for development consistency
+- Derby embedded mode eliminates external database dependencies
 
 ## 4. Development Guidelines
 
 ### 4.1 Code Standards
 
-**Coding Style**:
-- Java 8 language features
-- 4-space indentation
-- Descriptive method and variable names
-- PascalCase for class names, camelCase for methods/variables
+**Java Coding Style**:
+- **Language Version**: Java 8 compatibility throughout codebase
+- **Naming Conventions**: CamelCase for variables/methods, PascalCase for classes
+- **Package Organization**: Domain-driven package structure with clear layer separation
+- **Annotation Usage**: JAX-RS, JPA, and CDI annotations following framework conventions
 
-**Framework Conventions**:
-- JAX-RS annotations for REST endpoints
-- CDI `@Inject` for dependency injection
-- JPA annotations for entity mapping
-- MicroProfile annotations for JWT handling
+**Architectural Standards**:
+- **Dependency Injection**: CDI-based injection for all service and DAO dependencies
+- **Transaction Management**: JTA transactions with method-level annotation control
+- **Error Handling**: Centralized error response formatting with consistent HTTP status codes
+- **JSON Serialization**: Custom toJson() methods on entities for API response control
 
-**Architecture Standards**:
-- Request-scoped REST endpoints
-- Transactional DAO operations
-- Proper exception handling with custom error responses
-- JSON serialization through custom toJson() methods
+**Security Practices**:
+- **Authentication**: JWT-based stateless authentication with MicroProfile JWT
+- **Authorization**: Role-based access control with method-level security annotations
+- **Input Validation**: Required field validation and business rule enforcement
+- **Password Security**: Secure password handling in authentication flows
+
+**Performance Considerations**:
+- **Database Access**: Efficient JPA queries with relationship loading optimization
+- **Connection Pooling**: Liberty-managed connection pooling for database efficiency
+- **Caching Strategy**: No explicit caching implemented (relies on JPA first-level cache)
+- **Resource Management**: Proper EntityManager lifecycle management through CDI
 
 ### 4.2 Testing Strategy
 
-**Testing Framework**: JUnit 4.12 is configured with integration test support.
+**Integration Testing**: Test files exist in `src/test/java/it/` directory with `EndpointIT.java` implementing basic endpoint validation
 
-**Existing Tests**:
-- **Integration Tests**: `src/test/java/it/EndpointIT.java`
-  - Health endpoint verification (`/health`) - verifies MicroProfile Health endpoint returns UP status
-  - Basic articles endpoint test (`/api/articles`) - verifies empty articles list response
-  - Uses JAX-RS client for HTTP testing
+**Test Framework Configuration**:
+- **JUnit 4.12**: Primary testing framework for test execution
+- **Derby Test Database**: Embedded Derby database used for test execution isolation
+- **Jersey Test Framework**: Jersey test framework with JDK HTTP provider for endpoint testing
+- **Maven Test Integration**: Surefire plugin for unit tests, Failsafe plugin for integration tests
 
-**Test Configuration**:
-- Maven Surefire plugin for unit tests
-- Maven Failsafe plugin for integration tests
-- Derby database for test scope
-- Test server runs on ports 9080 (HTTP) and 9443 (HTTPS)
+**Current Test Coverage**:
+- **Health Endpoint Validation**: Basic health check endpoint verification
+- **Article Listing Test**: Empty article list retrieval validation
+- **Test Environment**: Isolated test execution with dedicated Derby database instance
 
-**Test Categories**:
-- **Integration Tests**: API endpoint testing with actual HTTP requests
-- **Database Tests**: Configured with Derby test database
-- **No Unit Tests**: No service-level or DAO-level unit tests currently implemented
+**Test Execution Commands**:
+- **Unit Tests**: `mvn test` (excludes integration tests)
+- **Integration Tests**: `mvn integration-test` (includes endpoint testing)
+- **Complete Test Suite**: `mvn verify` (runs both unit and integration tests)
 
 ### 4.3 Performance Considerations
 
-**Known Performance Characteristics**:
-- Embedded Derby database suitable for development, not production
-- No connection pooling configuration
-- No caching layer implemented
-- Default pagination limits (20 items per page)
+**Database Performance**:
+- **Embedded Derby**: Optimized for development and testing environments
+- **JPA Query Optimization**: Entity relationships configured with appropriate fetch strategies
+- **Connection Efficiency**: Liberty-managed connection pooling reduces connection overhead
 
-**Optimization Opportunities**:
-- Replace Derby with production database (PostgreSQL, MySQL)
-- Implement database connection pooling
-- Add caching for frequently accessed data
-- Optimize N+1 queries in article listings with followers/favorites
+**API Performance**:
+- **JSON Processing**: Efficient JSON serialization through custom entity methods
+- **Response Optimization**: Minimal data transfer with focused entity serialization
+- **Pagination Support**: Built-in pagination for article listings to manage large datasets
+
+**Resource Management**:
+- **Memory Usage**: Entity lifecycle managed through JPA and CDI containers
+- **CPU Optimization**: Efficient slug generation and JWT token processing
+- **Network Efficiency**: RESTful API design with appropriate HTTP methods and status codes
 
 ## 5. Deployment & Operations
 
 ### 5.1 Build Process
 
 **Maven Build Configuration**:
-- **Compile**: `mvn clean compile` - Compiles Java sources
-- **Package**: `mvn package` - Creates WAR artifact (`realworld-liberty.war`)
-- **Install**: `mvn clean install` - Full build with tests
-- **Dependencies**: Maven automatically resolves and packages dependencies
+- **Project Packaging**: WAR (Web Archive) packaging for Liberty deployment
+- **Dependency Management**: Maven coordinates with version management through parent POM
+- **Artifact Generation**: `realworld-liberty-1.0-SNAPSHOT.war` as deployable artifact
+- **Liberty Integration**: Liberty Maven plugin manages server lifecycle and deployment
 
-**Build Artifacts**:
-- WAR file: `target/realworld-liberty.war`
-- Liberty server package: `target/liberty/wlp/`
-- Derby database files: Embedded in shared resources
+**Build Commands & Outputs**:
+- **Clean Build**: `mvn clean install` - Complete build with dependency resolution and testing
+- **Package Creation**: `mvn package` - Generates WAR file in `target/` directory
+- **Dependency Resolution**: Maven automatically downloads and manages library dependencies
+- **Test Execution**: Integrated test execution during build process with reporting
 
-**Environment Configuration**:
-- Server ports configurable via Maven properties
-- Database configuration in `server.xml`
-- JWT issuer configuration in `server.xml`
+**Build Artifact Structure**:
+- **WAR Contents**: Compiled classes, dependency libraries, Liberty configuration, static resources
+- **Deployment Location**: Liberty server deploys WAR to `/realworld` context path
+- **Resource Management**: Derby database JAR copied to Liberty shared resources directory
 
 ### 5.2 Deployment Process
 
-**Local Development**:
-- `mvn liberty:run` - Starts server in foreground with live reload
-- `mvn liberty:start` - Starts server as background process
-- `mvn liberty:stop` - Stops background server process
+**Liberty Server Deployment**:
+- **Server Management**: Liberty Maven plugin handles server lifecycle (start, stop, deploy)
+- **Configuration**: Server configuration in `src/main/liberty/config/server.xml`
+- **Application Context**: Deployed to root context (`/`) with API base at `/api`
+- **Port Configuration**: HTTP on 9080, HTTPS on 9443 (configurable via Maven properties)
 
-**Server Configuration**:
-- Open Liberty runtime version 20.0.0.4
-- MicroProfile 3.0 and JPA 2.2 features enabled
-- Derby database auto-created on first startup
-- CORS configured for frontend integration
+**Database Deployment**:
+- **Embedded Derby**: Database files created automatically in Liberty server directory
+- **Schema Creation**: EclipseLink DDL generation creates tables on first deployment
+- **Data Persistence**: Database files persist between server restarts for data continuity
 
-**Environment Variables**:
-- `${default.http.port}` - HTTP port (default: 9080)
-- `${default.https.port}` - HTTPS port (default: 9443)
-- `${appLocation}` - WAR file location
-- `${warContext}` - Application context (realworld)
+**Environment Configuration**:
+- **CORS Settings**: Configured for `http://localhost:4100` frontend integration
+- **JWT Configuration**: Hardcoded issuer requires environment-specific updates for production
+- **Database Path**: Derby database location managed by Liberty server configuration
 
-**Important Configuration Notes**:
-- JWT issuer is hardcoded to `https://192.168.1.15:9443/jwt/defaultJWT` in both `server.xml` and `JwtGenerator.java`
-- This requires environment-specific configuration changes for different deployment environments
-- Derby database files are automatically created in `target/liberty/wlp/usr/shared/resources/`
-
-**Health Checks**:
-- Health endpoint available at `/health`
-- Returns JSON status with service availability
+**Deployment Commands**:
+- **Server Start**: `mvn liberty:start` (background process)
+- **Server Stop**: `mvn liberty:stop` (graceful shutdown)
+- **Development Mode**: `mvn liberty:run` (foreground with console output)
+- **Hot Deployment**: File changes trigger automatic redeployment during development
 
 ### 5.3 Monitoring & Debugging
 
 **Application Logging**:
-- Default Java logging through Open Liberty
-- Console output includes server startup, errors, and request logging
-- No structured logging framework configured
+- **Liberty Logging**: Standard Liberty server logging with configurable levels
+- **Application Logs**: Custom logging available through java.util.logging framework
+- **Console Output**: Real-time logging available through `mvn liberty:run` foreground mode
+- **Log Location**: Liberty server logs stored in server directory structure
+
+**Health Monitoring**:
+- **Health Endpoint**: Basic health check available at `/health` endpoint
+- **Endpoint Testing**: Integration tests verify health endpoint functionality
+- **Server Status**: Liberty server provides runtime status information
+- **Database Health**: Derby embedded database health monitored through connection status
 
 **Development Debugging**:
-- Java debugging port can be enabled in Liberty configuration
-- JAX-RS exception mappers for consistent error responses
-- Derby database can be accessed via network for debugging
+- **Hot Reload**: Liberty development mode supports automatic redeployment
+- **Debug Mode**: Standard Java debugging support through IDE integration
+- **Error Responses**: Comprehensive error responses with HTTP status codes and messages
+- **Console Debugging**: Real-time console output during development execution
 
 **Performance Monitoring**:
-- MicroProfile Metrics available but not configured
-- No APM tools integrated
-- Basic request logging through Liberty access logs
+- **Database Performance**: Derby embedded database performance suitable for development
+- **API Response Times**: RESTful endpoint performance monitoring through integration tests
+- **Resource Usage**: Java application resource monitoring through standard JVM tools
+- **Connection Monitoring**: Liberty connection pool monitoring and management
 
 ## 6. Quick Start Guides
 
 ### 6.1 For New Developers
 
-**5-Step Onboarding**:
-1. Install Java 8 JDK and Maven
-2. Clone repository: `git clone [repository-url]`
-3. Build project: `mvn clean install`
-4. Start server: `mvn liberty:run`
-5. Test API: `curl http://localhost:9080/api/articles`
+**5-Step Onboarding Process**:
+1. **Environment Setup**: Install Java 8 JDK and verify Maven installation
+2. **Project Setup**: Clone repository and run `mvn clean install` to verify build
+3. **Server Launch**: Execute `mvn liberty:start` and verify server at `http://localhost:9080`
+4. **API Testing**: Test health endpoint with `curl http://localhost:9080/health`
+5. **Code Exploration**: Examine `UsersAPI.java` and `ArticlesAPI.java` for REST endpoint patterns
 
 **First Feature Implementation**:
-1. **Create a new validation rule**: Add validation logic in `ValidationMessages.java`
-2. **Add validation to API**: Implement validation in relevant `*API.java` class
-3. **Test the validation**: Add test case in `EndpointIT.java`
-4. **Update error responses**: Ensure proper HTTP status codes returned
+Implement a new article tag counting endpoint:
+1. Create method in `TagsAPI.java` with `@GET @Path("/count")` annotation
+2. Inject `ArticleDao` and implement tag counting logic using existing methods
+3. Return JSON response with tag statistics in format `{"tagCount": integer}`
+4. Test endpoint with curl and verify JSON response format
+5. Add basic integration test in `EndpointIT.java` following existing patterns
 
-**Common Pitfalls**:
-- **Derby Database Locking**: Stop server properly with `mvn liberty:stop` to avoid database locks
-- **JWT Token Format**: Use `Authorization: Token {jwt}` not `Bearer {jwt}`
-- **Slug Conflicts**: Article titles must generate unique slugs
-- **Transaction Boundaries**: Use `@Transactional` for data modifications
+**Common Development Pitfalls**:
+- **JWT Configuration**: Remember to include `Authorization: Token {jwt}` header for authenticated endpoints
+- **Database State**: Derby database persists between server restarts; clean database by deleting server directory
+- **Maven Dependencies**: Always run `mvn clean install` after dependency changes
+- **Port Conflicts**: Ensure ports 9080 and 9443 are available before starting Liberty server
+- **JSON Format**: Follow exact JSON structure expected by RealWorld API specification
 
 ### 6.2 For QA Engineers
 
-**Running Tests**:
-- **Unit Tests**: `mvn test` (currently only basic tests exist)
-- **Integration Tests**: `mvn integration-test` (tests API endpoints)
-- **Full Test Suite**: `mvn clean install` (runs all tests)
+**Integration Test Execution**:
+- **Full Test Suite**: `mvn verify` runs complete test suite with integration tests
+- **Quick Validation**: `mvn test` executes unit tests for rapid feedback
+- **Server Testing**: `mvn integration-test` runs endpoint validation tests
+- **Test Reports**: Test results available in `target/test-reports/` directory
 
-**Test Data Management**:
-- Database resets on each server restart
-- Use API endpoints to create test data
-- Derby database files in `target/liberty/wlp/usr/shared/resources/`
+**API Testing & Validation**:
+- **Postman Collection**: `utility/Conduit.postman_collection.json` provides comprehensive API test suite
+- **Manual Testing**: Use curl or Postman for manual endpoint validation
+- **Authentication Testing**: Test JWT token generation and validation workflows
+- **Error Scenario Testing**: Validate error responses and HTTP status codes
 
-**Key Testing Areas**:
-- **Authentication Flow**: Registration, login, JWT token validation
-- **Article CRUD**: Creation, reading, updating, deletion with proper authorization
-- **Social Features**: Following users, favoriting articles, commenting
-- **Data Validation**: Required fields, unique constraints, proper error responses
-- **Authorization**: Ensuring users can only modify their own content
+**Key Testing Focus Areas**:
+- **User Registration & Authentication**: Validate user creation, login, and profile management
+- **Article CRUD Operations**: Test article creation, updates, deletion, and retrieval
+- **Social Features**: Verify following, favoriting, and personalized feed functionality
+- **Data Validation**: Test required field validation and business rule enforcement
+- **Authorization**: Confirm proper access control and permission enforcement
 
 **Bug Reporting Guidelines**:
-- Include curl commands or API request details
-- Check server logs in console output
-- Verify JWT token format and expiration
-- Test with clean database state
+- **API Endpoint**: Specify exact endpoint URL and HTTP method
+- **Request Payload**: Include complete request body and headers
+- **Expected vs Actual**: Document expected behavior vs actual response
+- **Environment**: Note Java version, Maven version, and server configuration
+- **Reproduction Steps**: Provide step-by-step reproduction instructions with specific data
 
 ## 7. Troubleshooting
 
-### Common Issues
-
-**Database Connection Problems**:
-- **Issue**: Derby database locked
-- **Solution**: Run `mvn liberty:stop` to properly shutdown server
-- **Prevention**: Always stop server cleanly, avoid force-killing processes
-
-**Authentication Failures**:
-- **Issue**: JWT token not recognized
-- **Solution**: Ensure token format is `Authorization: Token {jwt}`, not `Bearer`
-- **Check**: Verify token is not expired and user exists
-
-**Article Slug Conflicts**:
-- **Issue**: Article creation fails with slug already exists
-- **Solution**: Modify article title to generate unique slug
-- **Check**: Slugs are generated from title using slugify library
-
-### Environment Issues
-
-**Maven Build Failures**:
-- **Issue**: Compilation errors or dependency conflicts
-- **Solution**: Run `mvn clean install` to rebuild from scratch
-- **Check**: Ensure Java 8 JDK is installed and JAVA_HOME set
+### Common Issues & Solutions
 
 **Server Startup Problems**:
-- **Issue**: Port already in use (9080/9443)
-- **Solution**: Stop other processes or change ports in `pom.xml`
-- **Check**: `netstat -an | grep 9080` to verify port availability
+- **Port Conflicts**: Liberty server requires ports 9080 and 9443; verify availability with `netstat -an | grep 9080`
+- **Java Version**: Ensure Java 8 JDK is installed and JAVA_HOME environment variable is set correctly
+- **Maven Issues**: Verify Maven installation with `mvn -version` and ensure M2_HOME is configured
+- **Permission Errors**: Ensure write permissions for Liberty server directory creation
 
-### Runtime Errors
+**Database Connection Errors**:
+- **Derby Initialization**: Database creates automatically on first run; delete server directory to reset
+- **Connection Pool**: Liberty manages Derby connections automatically; restart server if connection issues occur
+- **Schema Problems**: EclipseLink creates tables automatically; check logs for DDL generation errors
+- **Data Corruption**: Remove Derby database files in Liberty server directory to start fresh
 
-**404 Not Found Errors**:
-- **Common Cause**: Incorrect API paths or missing resources
-- **Debug**: Check JAX-RS `@Path` annotations and URL construction
-- **Verify**: Ensure server started successfully and APIs are deployed
+**Authentication & Authorization Issues**:
+- **JWT Token Format**: Ensure Authorization header uses exact format `Token {jwt_token}` (not Bearer)
+- **Token Expiration**: JWT tokens may expire; re-authenticate to obtain fresh token
+- **User Permissions**: Verify user has appropriate role assignments for endpoint access
+- **CORS Problems**: Frontend requests from origins other than `localhost:4100` will be blocked
 
-**422 Validation Errors**:
-- **Common Cause**: Missing required fields in API requests
-- **Debug**: Check request JSON structure matches expected DTOs
-- **Verify**: Review `ValidationMessages.java` for specific error conditions
+**API Response Errors**:
+- **JSON Format**: Verify request payloads match exact structure expected by endpoints
+- **Required Fields**: Check that all required fields are present and non-empty
+- **Validation Errors**: Review validation messages for business rule violations
+- **HTTP Status Codes**: Use appropriate HTTP methods and expect correct status codes
 
-### Performance Issues
+**Build & Deployment Issues**:
+- **Maven Dependencies**: Run `mvn clean install` after any POM changes
+- **Compilation Errors**: Verify Java 8 source compatibility and resolve import issues
+- **WAR Deployment**: Check Liberty server logs for deployment errors and configuration issues
+- **Hot Reload Problems**: Restart server if automatic redeployment fails during development
 
-**Slow Database Operations**:
-- **Cause**: Derby embedded database not optimized for production
-- **Solution**: Consider upgrading to PostgreSQL or MySQL for production
-- **Temporary**: Restart server to clear Derby locks and optimize
+**Performance Issues**:
+- **Slow API Responses**: Derby embedded database may be slow for large datasets; consider external database for production
+- **Memory Usage**: Monitor JVM memory usage during development and testing
+- **Database Query Performance**: Review JPA queries and consider adding database indexes for production use
 
-**Memory Usage**:
-- **Monitor**: Java heap space usage during development
-- **Solution**: Increase JVM heap size if needed: `-Xmx512m`
-- **Check**: Derby database file size growth over time
+**Testing & Integration Problems**:
+- **Test Execution Failures**: Ensure test database is isolated and clean between test runs
+- **Integration Test Timeouts**: Verify server starts successfully before integration test execution
+- **Postman Collection Issues**: Update collection environment variables to match local server configuration

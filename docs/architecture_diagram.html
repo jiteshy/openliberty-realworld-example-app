@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenLiberty RealWorld - Architecture Diagram</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <title>OpenLiberty RealWorld Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,7 +16,7 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .container {
@@ -32,6 +32,7 @@
             padding: 12px 20px;
             text-align: center;
             flex-shrink: 0;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
         }
 
         .header h1 {
@@ -43,6 +44,7 @@
         .header p {
             font-size: 0.9em;
             opacity: 0.9;
+            font-weight: 400;
         }
 
         .zoom-controls {
@@ -77,11 +79,12 @@
         .usage-hint {
             font-size: 11px;
             color: #666;
+            font-style: italic;
         }
 
         .zoom-buttons {
             display: flex;
-            gap: 4px;
+            gap: 6px;
         }
 
         .zoom-btn {
@@ -89,9 +92,10 @@
             color: white;
             border: none;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
             font-size: 11px;
+            transition: background-color 0.2s;
         }
 
         .zoom-btn:hover {
@@ -100,8 +104,8 @@
 
         #diagram {
             flex: 1;
-            overflow: auto;
             position: relative;
+            overflow: auto;
             background: #fafafa;
         }
 
@@ -109,12 +113,13 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.7);
             color: white;
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            border-radius: 3px;
+            font-size: 11px;
             z-index: 1000;
+            pointer-events: none;
         }
 
         .diagram-container {
@@ -125,7 +130,7 @@
         }
 
         .mermaid {
-            text-align: center;
+            margin: 0 auto;
         }
 
         .legend {
@@ -146,11 +151,11 @@
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             padding: 4px;
             background: white;
             border-radius: 3px;
-            border: 1px solid #dee2e6;
+            border: 1px solid #e1e5e9;
         }
 
         .legend-color {
@@ -160,25 +165,17 @@
             flex-shrink: 0;
         }
 
-        .legend-text {
+        .legend-label {
             font-size: 11px;
-            line-height: 1.2;
+            font-weight: 500;
+            color: #333;
         }
-
-        /* Legend colors matching the diagram */
-        .color-external { background-color: #e1f5fe; border: 1px solid #01579b; }
-        .color-server { background-color: #f3e5f5; border: 1px solid #4a148c; }
-        .color-api { background-color: #e8f5e8; border: 1px solid #1b5e20; }
-        .color-dao { background-color: #fff3e0; border: 1px solid #e65100; }
-        .color-entity { background-color: #fce4ec; border: 1px solid #880e4f; }
-        .color-database { background-color: #f1f8e9; border: 1px solid #33691e; }
-        .color-security { background-color: #fff8e1; border: 1px solid #ff6f00; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>OpenLiberty RealWorld Example App Architecture</h1>
+            <h1>OpenLiberty RealWorld Architecture</h1>
             <p>System Architecture Diagram</p>
         </div>
 
@@ -198,118 +195,134 @@
             <div class="zoom-level-indicator" id="zoomIndicator">25%</div>
             <div class="diagram-container">
                 <div class="mermaid">
-flowchart TD
-    %% External Layer
-    Client["🌐 Client Applications<br/>(Web/Mobile)"]
-    Frontend["🎨 Frontend Application<br/>(React/Angular)"]
-    
-    %% API Gateway Layer
-    Liberty["🚀 Open Liberty Server<br/>v20.0.0.4"]
-    CORS["🔄 CORS Configuration<br/>(localhost:4100)"]
-    Health["❤️ MicroProfile Health<br/>(/health endpoint)"]
-    
-    %% Authentication Layer
-    JWT["🔐 JWT Authentication<br/>(MicroProfile JWT)"]
-    JWTGen["🔑 JWT Generator<br/>(Custom Issuer)"]
-    
-    %% REST API Layer
-    subgraph "REST API Endpoints"
-        UsersAPI["👤 Users API<br/>(Registration/Login)"]
-        ArticlesAPI["📝 Articles API<br/>(CRUD Operations)"]
-        ProfilesAPI["👥 Profiles API<br/>(Follow/Unfollow)"]
-        TagsAPI["🏷️ Tags API<br/>(Content Categories)"]
-        CommentsAPI["💬 Comments API<br/>(Article Discussion)"]
-    end
-    
-    %% Business Logic Layer
-    subgraph "Data Access Layer"
-        UserDao["👤 User DAO<br/>(User Operations)"]
-        ArticleDao["📝 Article DAO<br/>(Article Operations)"]
-        UserContext["🔄 User Context<br/>(Business Logic)"]
-    end
-    
-    %% Data Model Layer
-    subgraph "JPA Entities"
-        UserEntity["👤 User Entity<br/>(Authentication Data)"]
-        ArticleEntity["📝 Article Entity<br/>(Content Data)"]
-        CommentEntity["💬 Comment Entity<br/>(Discussion Data)"]
-        ProfileEntity["👥 Profile Entity<br/>(Public Display)"]
-    end
-    
-    %% Persistence Layer
-    JPA["🗃️ JPA 2.2<br/>(EclipseLink)"]
-    Derby["🗄️ Derby Database<br/>(Embedded)"]
-    
-    %% External Integration
-    Slugify["🔗 Slugify Library<br/>(URL Generation)"]
-    
-    %% Flow Connections
-    Client --> Liberty
-    Frontend --> Liberty
-    Liberty --> CORS
-    Liberty --> Health
-    Liberty --> JWT
-    JWT --> JWTGen
-    
-    Liberty --> UsersAPI
-    Liberty --> ArticlesAPI
-    Liberty --> ProfilesAPI
-    Liberty --> TagsAPI
-    Liberty --> CommentsAPI
-    
-    UsersAPI --> UserDao
-    ArticlesAPI --> ArticleDao
-    ArticlesAPI --> UserContext
-    ProfilesAPI --> UserContext
-    CommentsAPI --> ArticleDao
-    
-    UserDao --> JPA
-    ArticleDao --> JPA
-    UserContext --> JPA
-    
-    JPA --> UserEntity
-    JPA --> ArticleEntity
-    JPA --> CommentEntity
-    JPA --> ProfileEntity
-    
-    JPA --> Derby
-    
-    ArticlesAPI --> Slugify
-    
-    %% Click Events to GitHub Repository
-    click Liberty href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/liberty/config/server.xml" _blank
-    click Health href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/HealthEndpoint.java" _blank
-    click JWTGen href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/security/JwtGenerator.java" _blank
-    click UsersAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/UsersAPI.java" _blank
-    click ArticlesAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/ArticlesAPI.java" _blank
-    click ProfilesAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/ProfilesAPI.java" _blank
-    click TagsAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/TagsAPI.java" _blank
-    click UserDao href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/dao/UserDao.java" _blank
-    click ArticleDao href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/dao/ArticleDao.java" _blank
-    click UserContext href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/dao/UserContext.java" _blank
-    click UserEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/user/User.java" _blank
-    click ArticleEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/article/Article.java" _blank
-    click CommentEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/comments/Comment.java" _blank
-    click ProfileEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/user/Profile.java" _blank
-    click JPA href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/resources/META-INF/persistence.xml" _blank
-    click Derby href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/pom.xml" _blank
-    
-    %% Styling
-    classDef external fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef server fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef api fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef dao fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef entity fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    classDef database fill:#f1f8e9,stroke:#33691e,stroke-width:2px
-    classDef security fill:#fff8e1,stroke:#ff6f00,stroke-width:2px
-    
-    class Client,Frontend external
-    class Liberty,CORS,Health server
-    class UsersAPI,ArticlesAPI,ProfilesAPI,TagsAPI,CommentsAPI api
-    class UserDao,ArticleDao,UserContext dao
-    class UserEntity,ArticleEntity,CommentEntity,ProfileEntity entity
-    class JPA,Derby database
-    class JWT,JWTGen,Slugify security
+                    flowchart TD
+                        %% Client Interaction Layer
+                        Client["🌐 Client Applications<br/>(Frontend / Mobile / API Consumer)"]
+                        
+                        %% Authentication & Security Layer
+                        subgraph "Authentication & Security"
+                            JWT["🔐 JWT Generator<br/>(MicroProfile JWT 1.0)"]
+                            Auth["🛡️ Authorization<br/>(@RolesAllowed)"]
+                        end
+                        
+                        %% REST API Layer
+                        subgraph "JAX-RS REST API Layer"
+                            Health["❤️ Health Endpoint<br/>(MicroProfile Health)"]
+                            UsersAPI["👤 Users API<br/>(Registration & Login)"]
+                            ArticlesAPI["📝 Articles API<br/>(CRUD Operations)"]
+                            ProfilesAPI["👥 Profiles API<br/>(Social Features)"]
+                            TagsAPI["🏷️ Tags API<br/>(Content Organization)"]
+                        end
+                        
+                        %% Business Logic & Data Access Layer
+                        subgraph "Data Access Layer (DAO Pattern)"
+                            UserDao["👤 User DAO<br/>(User Operations)"]
+                            ArticleDao["📝 Article DAO<br/>(Article Operations)"]
+                            UserContext["🔄 User Context<br/>(Business Logic)"]
+                        end
+                        
+                        %% Core Domain Entities
+                        subgraph "JPA Entity Layer"
+                            UserEntity["👤 User Entity<br/>(Account Data)"]
+                            ProfileEntity["👥 Profile Entity<br/>(Public Profile)"]
+                            ArticleEntity["📝 Article Entity<br/>(Content Data)"]
+                            CommentEntity["💬 Comment Entity<br/>(Discussion Data)"]
+                        end
+                        
+                        %% Persistence Layer
+                        subgraph "Persistence & Infrastructure"
+                            JPA["🗃️ JPA 2.2<br/>(EclipseLink ORM)"]
+                            Derby["🗄️ Derby Database<br/>(Embedded)"]
+                            Liberty["⚙️ Open Liberty Server<br/>(MicroProfile 3.0)"]
+                        end
+                        
+                        %% External Libraries
+                        subgraph "External Dependencies"
+                            Jersey["🌐 Jersey 2.30.1<br/>(JAX-RS Implementation)"]
+                            Slugify["🔗 Slugify Library<br/>(URL Generation)"]
+                            JsonLib["📋 JSON Library<br/>(org.json)"]
+                        end
+                        
+                        %% Flow Connections
+                        Client --> Auth
+                        Client --> Health
+                        
+                        Auth --> UsersAPI
+                        Auth --> ArticlesAPI
+                        Auth --> ProfilesAPI
+                        Auth --> TagsAPI
+                        
+                        UsersAPI --> JWT
+                        UsersAPI --> UserDao
+                        
+                        ArticlesAPI --> UserDao
+                        ArticlesAPI --> ArticleDao
+                        ArticlesAPI --> Slugify
+                        
+                        ProfilesAPI --> UserContext
+                        TagsAPI --> ArticleDao
+                        
+                        UserDao --> UserContext
+                        ArticleDao --> UserContext
+                        
+                        UserDao --> UserEntity
+                        UserDao --> ProfileEntity
+                        ArticleDao --> ArticleEntity
+                        ArticleDao --> CommentEntity
+                        
+                        UserEntity --> JPA
+                        ProfileEntity --> JPA
+                        ArticleEntity --> JPA
+                        CommentEntity --> JPA
+                        
+                        JPA --> Derby
+                        
+                        UsersAPI --> Jersey
+                        ArticlesAPI --> Jersey
+                        ProfilesAPI --> Jersey
+                        TagsAPI --> Jersey
+                        Health --> Jersey
+                        
+                        ArticlesAPI --> JsonLib
+                        UsersAPI --> JsonLib
+                        
+                        Liberty -.-> JPA
+                        Liberty -.-> Derby
+                        Liberty -.-> Jersey
+                        
+                        %% Component Click Events (GitHub Links)
+                        click Health href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/HealthEndpoint.java" _blank
+                        click JWT href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/security/JwtGenerator.java" _blank
+                        click UsersAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/UsersAPI.java" _blank
+                        click ArticlesAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/ArticlesAPI.java" _blank
+                        click ProfilesAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/ProfilesAPI.java" _blank
+                        click TagsAPI href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/application/rest/TagsAPI.java" _blank
+                        click UserDao href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/dao/UserDao.java" _blank
+                        click ArticleDao href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/dao/ArticleDao.java" _blank
+                        click UserContext href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/dao/UserContext.java" _blank
+                        click UserEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/user/User.java" _blank
+                        click ProfileEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/user/Profile.java" _blank
+                        click ArticleEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/article/Article.java" _blank
+                        click CommentEntity href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/java/core/comments/Comment.java" _blank
+                        click Liberty href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/liberty/config/server.xml" _blank
+                        click JPA href "https://github.com/jiteshy/openliberty-realworld-example-app/blob/main/src/main/resources/META-INF/persistence.xml" _blank
+                        
+                        %% Styling
+                        classDef clientStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+                        classDef authStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
+                        classDef apiStyle fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+                        classDef daoStyle fill:#fff8e1,stroke:#ff6f00,stroke-width:2px
+                        classDef entityStyle fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+                        classDef persistStyle fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+                        classDef libStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+                        
+                        class Client clientStyle
+                        class JWT,Auth authStyle
+                        class Health,UsersAPI,ArticlesAPI,ProfilesAPI,TagsAPI apiStyle
+                        class UserDao,ArticleDao,UserContext daoStyle
+                        class UserEntity,ProfileEntity,ArticleEntity,CommentEntity entityStyle
+                        class JPA,Derby,Liberty persistStyle
+                        class Jersey,Slugify,JsonLib libStyle
                 </div>
             </div>
         </div>
@@ -317,39 +330,39 @@ flowchart TD
         <div class="legend">
             <div class="legend-grid">
                 <div class="legend-item">
-                    <div class="legend-color color-external"></div>
-                    <span class="legend-text">External Clients</span>
+                    <div class="legend-color" style="background-color: #e1f5fe; border: 1px solid #01579b;"></div>
+                    <span class="legend-label">Client Layer</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color color-server"></div>
-                    <span class="legend-text">Server Layer</span>
+                    <div class="legend-color" style="background-color: #fff3e0; border: 1px solid #e65100;"></div>
+                    <span class="legend-label">Authentication</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color color-api"></div>
-                    <span class="legend-text">REST API</span>
+                    <div class="legend-color" style="background-color: #e8f5e8; border: 1px solid #1b5e20;"></div>
+                    <span class="legend-label">REST API</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color color-dao"></div>
-                    <span class="legend-text">Data Access</span>
+                    <div class="legend-color" style="background-color: #fff8e1; border: 1px solid #ff6f00;"></div>
+                    <span class="legend-label">Data Access</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color color-entity"></div>
-                    <span class="legend-text">JPA Entities</span>
+                    <div class="legend-color" style="background-color: #fce4ec; border: 1px solid #880e4f;"></div>
+                    <span class="legend-label">JPA Entities</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color color-database"></div>
-                    <span class="legend-text">Database</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color color-security"></div>
-                    <span class="legend-text">Security/Utils</span>
+                    <div class="legend-color" style="background-color: #f1f8e9; border: 1px solid #33691e;"></div>
+                    <span class="legend-label">Persistence</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize Mermaid with loose security for GitHub links
+        let zoomLevel = 0.25;
+        const minZoom = 0.15;
+        const maxZoom = 3;
+
+        // Initialize Mermaid with loose security level for GitHub links
         mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
@@ -360,29 +373,22 @@ flowchart TD
             securityLevel: 'loose'
         });
 
-        // Zoom functionality
-        let zoomLevel = 0.25;
-        const minZoom = 0.15;
-        const maxZoom = 3;
-        const zoomStep = 0.25;
-
         function updateZoom() {
             const container = document.querySelector('.diagram-container');
-            const indicator = document.getElementById('zoomIndicator');
             container.style.transform = `scale(${zoomLevel})`;
-            indicator.textContent = Math.round(zoomLevel * 100) + '%';
+            document.getElementById('zoomIndicator').textContent = Math.round(zoomLevel * 100) + '%';
         }
 
         function zoomIn() {
             if (zoomLevel < maxZoom) {
-                zoomLevel = Math.min(zoomLevel + zoomStep, maxZoom);
+                zoomLevel = Math.min(maxZoom, zoomLevel + 0.1);
                 updateZoom();
             }
         }
 
         function zoomOut() {
             if (zoomLevel > minZoom) {
-                zoomLevel = Math.max(zoomLevel - zoomStep, minZoom);
+                zoomLevel = Math.max(minZoom, zoomLevel - 0.1);
                 updateZoom();
             }
         }
@@ -390,38 +396,44 @@ flowchart TD
         function resetZoom() {
             zoomLevel = 0.25;
             updateZoom();
-            setTimeout(centerDiagram, 100);
+            centerDiagram();
         }
 
         function centerDiagram() {
             const diagramElement = document.getElementById('diagram');
-            const containerWidth = diagramElement.scrollWidth;
-            const containerHeight = diagramElement.scrollHeight;
-            const viewWidth = diagramElement.clientWidth;
-            const viewHeight = diagramElement.clientHeight;
+            const diagramContainer = document.querySelector('.diagram-container');
             
-            diagramElement.scrollLeft = (containerWidth - viewWidth) / 2;
-            diagramElement.scrollTop = (containerHeight - viewHeight) / 2;
+            setTimeout(() => {
+                const scrollLeft = (diagramElement.scrollWidth - diagramElement.clientWidth) / 2;
+                const scrollTop = (diagramElement.scrollHeight - diagramElement.clientHeight) / 2;
+                
+                diagramElement.scrollLeft = scrollLeft;
+                diagramElement.scrollTop = scrollTop;
+            }, 100);
         }
 
         // Keyboard support
         document.addEventListener('keydown', function(e) {
-            // Only zoom if not typing in an input field
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.target.tagName.toLowerCase() === 'input') return;
             
-            if (e.key === '+' || e.key === '=') {
-                e.preventDefault();
-                zoomIn();
-            } else if (e.key === '-') {
-                e.preventDefault();
-                zoomOut();
-            } else if (e.key === '0') {
-                e.preventDefault();
-                resetZoom();
+            switch(e.key) {
+                case '+':
+                case '=':
+                    e.preventDefault();
+                    zoomIn();
+                    break;
+                case '-':
+                    e.preventDefault();
+                    zoomOut();
+                    break;
+                case '0':
+                    e.preventDefault();
+                    resetZoom();
+                    break;
             }
         });
 
-        // Mouse wheel zoom support
+        // Mouse wheel support
         document.getElementById('diagram').addEventListener('wheel', function(e) {
             if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
