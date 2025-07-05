@@ -62,14 +62,73 @@ List all major features with:
 - **Configuration**: Environment variables, config files, and their purposes (only document environment configs that actually exist)
 - **Common Commands**: Development, testing, building, and deployment commands (use project-specific build system: npm/yarn for JS, mvn/gradle for Java, pip/poetry for Python, dotnet for .NET, etc.)
 
-#### 3.3 Code Organization
+#### 3.3 Application Configuration
+
+**CRITICAL**: Document ALL configuration requirements for the application to run properly in different environments.
+
+**Configuration Discovery Process**:
+- **Environment Files**: Check for .env, environment.ts, config.json, appsettings.json, etc.
+- **Configuration Classes/Modules**: Look for config/ folders, settings files, or configuration classes
+- **Runtime Configuration**: Identify configuration loaded at startup vs compile-time
+- **Default Values**: Document what works out-of-the-box vs what must be configured
+
+**Configuration Documentation Structure**:
+
+**Required Configuration**:
+- **Database Connection**: Database URLs, credentials, connection pool settings
+- **External Services**: API keys, service endpoints, authentication credentials
+- **Security Settings**: JWT secrets, encryption keys, CORS origins, SSL certificates
+- **Environment Variables**: List ALL required environment variables with descriptions
+
+**Optional Configuration**:
+- **Feature Flags**: Optional features that can be enabled/disabled
+- **Performance Tuning**: Cache sizes, timeout values, rate limiting
+- **Logging**: Log levels, output destinations, structured logging settings
+- **Monitoring**: Health check endpoints, metrics collection, alerting
+
+**Configuration Sources** (document what actually exists):
+- **Environment Variables**: Which variables are read and their purposes
+- **Configuration Files**: Location, format (JSON, YAML, properties), and hierarchy
+- **Command Line Arguments**: Supported CLI flags and their effects
+- **External Configuration Services**: Consul, AWS Parameter Store, etc.
+
+**Configuration Examples**:
+```bash
+# Required environment variables
+DATABASE_URL=postgresql://localhost:5432/myapp
+API_KEY=your-api-key-here
+JWT_SECRET=your-secret-key
+
+# Optional configuration
+LOG_LEVEL=info
+CACHE_TTL=3600
+ENABLE_FEATURE_X=true
+```
+
+**Configuration Validation**:
+- **Startup Validation**: How the app validates configuration on startup
+- **Error Messages**: What happens when required configuration is missing
+- **Configuration Testing**: How to verify configuration is working correctly
+
+**Environment-Specific Configuration**:
+- **Development**: Local development settings and defaults
+- **Testing**: Test environment configuration requirements
+- **Staging**: Pre-production configuration considerations
+- **Production**: Production-ready configuration and security requirements
+
+**Configuration Security**:
+- **Secret Management**: How sensitive configuration is handled
+- **Configuration Encryption**: If configuration values are encrypted
+- **Access Control**: Who can modify configuration in different environments
+
+#### 3.4 Code Organization
 
 - **Directory Structure**: Purpose of each major folder
 - **File Naming Conventions**: Patterns used for different file types
 - **Import/Export Patterns**: How modules are organized and connected
 - **State Management**: How application state is handled
 
-#### 3.4 API Documentation
+#### 3.5 API Documentation
 
 **For Backend Services**:
 
@@ -83,11 +142,29 @@ List all major features with:
 **For Frontend Applications**:
 
 - **External APIs**: Third-party services consumed and their purposes
-- **API Integration**: How the frontend communicates with backend services
+- **API Endpoints Inventory**: Complete list of all API endpoints called by the application
+  - HTTP methods (GET, POST, PUT, DELETE) and URL patterns
+  - Purpose and functionality of each endpoint
+  - Request parameters and body structure
+  - Response data format and structure
+  - Authentication requirements per endpoint
+- **API Service Architecture**: How API calls are organized and structured
+  - Service layer organization (API service files, HTTP client configuration)
+  - Request/response interceptors and middleware
+  - Error handling and retry mechanisms
+  - Base URL configuration and environment handling
 - **Authentication Flow**: Token management and session handling
-- **Error Handling**: How API errors are displayed to users
+  - Authentication method (JWT, cookies, OAuth, etc.)
+  - Token storage and transmission
+  - Session management and refresh logic
+  - Protected route handling
+- **API Integration Patterns**: How the frontend communicates with backend services
+  - Async operation handling (Promises, Observables, async/await)
+  - Loading states and error boundaries
+  - Caching strategies and data persistence
+  - Real-time data handling (WebSockets, SSE, polling)
 
-#### 3.5 Data Management
+#### 3.6 Data Management
 
 **For Backend Services**:
 
@@ -99,10 +176,38 @@ List all major features with:
 
 **For Frontend Applications**:
 
-- **Client-Side State**: How application state is structured and managed
+- **State Management Architecture**: How application state is structured and managed
+  - State management library used (Redux, NgRx, Vuex, Zustand, Context API, etc.)
+  - Global vs local state organization
+  - Store structure and module/slice organization
+  - State initialization and default values
+- **Store Documentation**: Detailed breakdown of state management stores
+  - Store responsibilities and domain boundaries
+  - State shape and data structures for each store
+  - Actions/mutations/methods available in each store
+  - Selectors/getters for derived state (if applicable)
+  - Async operation handling (effects, thunks, sagas)
+- **Data Flow Patterns**: How data moves through the application
+  - Component to store communication patterns
+  - Store to store communication (if applicable)
+  - Side effect management (API calls, navigation, etc.)
+  - State update patterns and immutability rules
+  - Event handling and user interaction flows
 - **Data Models**: TypeScript interfaces, PropTypes, or other type definitions
-- **Local Storage**: Session storage, localStorage, or IndexedDB usage
+  - Core entity interfaces and types
+  - API response and request type definitions
+  - Component prop interfaces
+  - Store state type definitions
+- **Local Storage & Persistence**: Session storage, localStorage, or IndexedDB usage
+  - What data is persisted locally
+  - Persistence strategies and lifecycle
+  - Data hydration and rehydration patterns
+  - Cache invalidation and cleanup
 - **Data Synchronization**: How frontend stays in sync with backend data
+  - Real-time updates and WebSocket handling
+  - Optimistic updates and rollback strategies
+  - Conflict resolution and error recovery
+  - Background sync and offline support
 
 ### 4. Development Guidelines
 
@@ -155,27 +260,32 @@ List all major features with:
 **For Backend Services**:
 
 **JavaScript/Node.js**:
+
 - npm/yarn build scripts and their outputs
 - TypeScript compilation (tsc)
 - Bundle analysis and optimization
 
 **Java**:
+
 - Maven: `mvn clean compile`, `mvn package`, `mvn install`
 - Gradle: `./gradlew build`, `./gradlew bootJar`, `./gradlew war`
 - JAR/WAR artifact generation and dependencies
 
 **Python**:
+
 - pip: dependency installation via requirements.txt
 - Poetry: `poetry build`, `poetry install`
 - Wheel/source distribution creation
 - Virtual environment activation
 
 **Other Technologies**:
+
 - .NET: `dotnet build`, `dotnet publish`
 - PHP: `composer install`, `composer dump-autoload`
 - Go: `go build`, `go mod download`
 
 **Universal**:
+
 - Dependency resolution and packaging
 - Environment configuration management
 - Docker containerization (if used)
@@ -243,6 +353,7 @@ List all major features with:
 
 2. **Determine Package Manager & Build System**:
    **JavaScript/TypeScript Projects**:
+
    - Check for yarn.lock (Yarn), package-lock.json (npm), pnpm-lock.yaml (pnpm)
    - **CRITICAL CHECK**: Compare with README.md recommendations - document any discrepancies
    - Use ONLY the package manager found in lock files - do not mention alternatives
@@ -250,24 +361,28 @@ List all major features with:
    - If package-lock.json exists, use ONLY npm commands throughout documentation
    - If yarn.lock exists, use ONLY yarn commands throughout documentation
    - **NEVER MIX**: Do not provide both npm and yarn command examples
-   
+
    **Java Projects**:
+
    - Check for pom.xml (Maven), build.gradle/build.gradle.kts (Gradle)
    - Use mvn commands for Maven projects, gradle/gradlew commands for Gradle projects
    - Document wrapper scripts (mvnw, gradlew) if they exist
-   
+
    **Python Projects**:
+
    - Check for requirements.txt, pyproject.toml, Pipfile, setup.py, poetry.lock
    - Use pip commands for requirements.txt, poetry commands for pyproject.toml/poetry.lock
    - Document virtual environment setup (venv, conda, poetry)
-   
+
    **Other Web Technologies**:
+
    - PHP: composer.json (Composer)
-   - .NET: *.csproj, *.sln (dotnet CLI)
+   - .NET: _.csproj, _.sln (dotnet CLI)
    - Go: go.mod (go commands)
    - Rust: Cargo.toml (cargo commands)
-   
+
    **Project Type Indicators**:
+
    - **Frontend**: package.json, yarn.lock/package-lock.json, npm dependencies, UI frameworks
    - **Backend**: package.json, requirements.txt, pom.xml, build.gradle, go.mod, Cargo.toml, composer.json
 
@@ -305,17 +420,45 @@ List all major features with:
    - **Frontend**: User interfaces, form submissions, navigation
    - **Backend**: API endpoints, request/response cycles, external integrations
 
-8. **Extract Business Logic**:
+8. **Frontend-Specific Analysis Requirements**:
+
+   - **API Endpoint Discovery**: Search service files, HTTP client usage, and API calls
+     - Identify ALL API endpoints called (GET, POST, PUT, DELETE)
+     - Document request/response patterns and data structures
+     - Map endpoints to their purpose and functionality
+     - Verify authentication requirements for each endpoint
+   - **State Management Analysis**: Examine store files, reducers, actions, and state patterns
+     - Identify state management library (Redux, NgRx, Vuex, Zustand, etc.)
+     - Document each store's responsibilities and state shape
+     - Map actions/mutations and their effects
+     - Trace data flow from components to stores to API calls
+     - Document async operation handling (effects, thunks, sagas)
+   - **Component-Store Integration**: Analyze how components interact with state management
+     - Document subscription patterns and state selection
+     - Map user interactions to state updates
+     - Identify optimistic updates and error handling patterns
+
+9. **Extract Business Logic**:
 
    - **Frontend**: Form validation, client-side calculations, UI state rules
    - **Backend**: Data validation, business rules, database constraints
 
-9. **Review Configuration**:
+10. **Review Configuration**:
 
    - **Frontend**: Build configs, environment variables (if they exist), router setup, API configuration (hardcoded vs configurable)
    - **Backend**: Database configs, middleware setup, environment variables
 
-10. **External Documentation Validation**:
+11. **Configuration Analysis** (All Project Types):
+
+   - **Configuration File Discovery**: Search for .env, environment.ts, config.json, appsettings.json, settings.py, etc.
+   - **Environment Variable Usage**: Identify all environment variables read by the application
+   - **Configuration Classes**: Look for configuration modules, settings classes, or config objects
+   - **Default Values**: Document what configuration has defaults vs what must be explicitly set
+   - **Configuration Validation**: Check for startup validation or configuration error handling
+   - **Secret Management**: Identify how sensitive configuration (API keys, passwords) is handled
+   - **Environment-Specific Configs**: Document differences between dev, test, staging, production configs
+
+12. **External Documentation Validation**:
     - Read existing README.md, CONTRIBUTING.md for conflicting information
     - Identify discrepancies between README and actual project setup
     - When conflicts exist, prioritize actual project configuration over README claims
@@ -380,5 +523,13 @@ List all major features with:
 13. **Email Validation Check**: Search for Validators.email or equivalent email format validation before claiming email validation exists
 14. **CRUD Method Verification**: Verify edit workflows call update methods and create workflows call create methods
 15. **UI vs Business Logic Check**: Distinguish between UI element hiding and actual business rule enforcement
+16. **API Endpoint Verification**: Ensure all documented API endpoints exist in service files and are actually called
+17. **State Management Verification**: Confirm documented stores, actions, and state structures exist in the codebase
+18. **Store Responsibility Verification**: Verify documented store responsibilities match actual implementation
+19. **Configuration File Verification**: Confirm all documented configuration files and environment variables actually exist
+20. **Configuration Requirements Verification**: Ensure documented required vs optional configuration matches actual implementation
+21. **Environment Variable Verification**: Verify all documented environment variables are actually read by the application
 
 Generate this documentation by thoroughly analyzing the provided codebase, ensuring every statement is backed by actual code evidence, and organizing information in a way that maximizes developer and QA productivity from day one.
+
+**Critical Frontend Requirements**: For frontend applications, the documentation MUST include a complete inventory of API endpoints and comprehensive state management details. Missing these aspects renders the documentation incomplete for frontend development teams.

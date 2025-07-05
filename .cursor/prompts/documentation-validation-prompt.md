@@ -1,6 +1,6 @@
 # Documentation Validation & Correction Prompt
 
-You are a senior software architect tasked with validating the accuracy of generated project documentation against the actual source code. Your goal is to identify false claims, gaps, and inaccuracies, then provide corrections for both the documentation and the generation prompt.
+You are a principal software engineer tasked with validating the accuracy of generated project documentation against the actual source code, then applying corrections using composite context. Your goal is to identify false claims, gaps, and inaccuracies, then provide corrected documentation using both generic principles and project-specific learnings.
 
 **Input**: 
 - Generated documentation (markdown file)
@@ -8,9 +8,31 @@ You are a senior software architect tasked with validating the accuracy of gener
 - The documentation generation prompt used
 
 **Output**: 
-- Updated documentation with corrections
-- Recommended improvements to the documentation generation prompt
+- Corrected documentation with validated accuracy
+- Project-specific learning file with technology-specific insights
 - Validation report with findings
+
+**Composite Context Application**: This process uses BOTH:
+- The generic documentation generation prompt (technology-agnostic principles)
+- Project-specific validation learnings and technology-specific rules (created during this phase)
+
+## Required Outputs
+
+1. **Validation Report Display**: Present findings in chat window with clear metrics
+2. **Documentation Correction**: Apply all corrections to `docs/PROJECT_DOCUMENTATION.md`
+3. **Learning Capture**: Create/update `.cursor/learning/workflow-learnings.md` with project insights
+4. **Validation Report**: Generate `.cursor/learning/VALIDATION_REPORT.md` with detailed accuracy metrics and validation findings
+5. **Generic Prompt Preservation**: Keep documentation-generation-prompt.md unchanged
+
+## Success Criteria
+
+- [ ] Every factual claim verified against source code
+- [ ] All inaccuracies corrected using composite context (generic + learnings)
+- [ ] Documentation accuracy improved to 95%+ from baseline
+- [ ] Project-specific learning patterns captured in `.cursor/learning/workflow-learnings.md`
+- [ ] Comprehensive validation metrics documented in `.cursor/learning/VALIDATION_REPORT.md`
+- [ ] Generic documentation prompt remains technology-agnostic and reusable
+- [ ] Final documentation ready for production team use
 
 ## Validation Methodology
 
@@ -50,21 +72,115 @@ You are a senior software architect tasked with validating the accuracy of gener
 - Validate version numbers against package.json
 - **Red Flags**: Mentioning unused dependencies, incorrect versions
 
+#### 1.6 Configuration Management Verification
+**Check**: Are configuration claims accurate and complete?
+- **Configuration File Existence**: Verify documented config files actually exist
+  - Check for documented .env, environment.ts, config.json, appsettings.json files
+  - Verify configuration classes/modules exist in documented locations
+  - Validate runtime vs compile-time configuration claims
+  - Confirm default values documentation matches implementation
+- **Required Configuration**: Verify documented requirements are accurate
+  - Check database connection requirements against actual implementation
+  - Verify external service configuration needs (API keys, endpoints)
+  - Validate security settings requirements (JWT secrets, CORS, SSL)
+  - Confirm environment variables are actually read by the application
+- **Optional Configuration**: Verify optional settings documentation
+  - Check feature flags implementation matches documentation
+  - Verify performance tuning options exist (cache sizes, timeouts)
+  - Validate logging configuration options
+  - Confirm monitoring settings are implemented
+- **Configuration Sources**: Verify documented sources are accurate
+  - Check environment variable usage against actual code
+  - Verify configuration file hierarchy and precedence
+  - Validate CLI argument support if documented
+  - Confirm external configuration service integration if claimed
+- **Configuration Validation**: Verify startup validation claims
+  - Check if application validates configuration on startup
+  - Verify error handling for missing required configuration
+  - Validate configuration testing documentation
+- **Environment-Specific Configuration**: Verify environment handling
+  - Check development vs production configuration differences
+  - Verify staging and testing environment requirements
+  - Validate configuration security measures (encryption, access control)
+- **Red Flags**: Documenting configuration files that don't exist, claiming environment variables not read by code, incorrect required vs optional classification, non-existent validation or error handling
+
 ### Phase 2: Feature Accuracy Verification
 
 #### 2.1 API Integration Verification
 **Check**: Are API claims accurate?
-- Examine interceptors, HTTP client configuration
-- Verify API endpoint documentation against actual service calls
-- Check authentication implementation (JWT, localStorage, etc.)
-- **Red Flags**: Incorrect API patterns, wrong endpoint documentation
+
+**For Frontend Applications**:
+- **API Endpoints Inventory**: Verify documented endpoints against actual service files
+  - Check HTTP methods (GET, POST, PUT, DELETE) match actual service calls
+  - Verify URL patterns and parameters match implementation
+  - Confirm request/response structure documentation against actual interfaces
+  - Validate authentication requirements per endpoint
+- **API Service Architecture**: Verify service layer organization claims
+  - Check documented service files exist and match descriptions
+  - Verify HTTP client configuration against actual implementation
+  - Validate interceptor documentation against actual interceptor files
+  - Confirm error handling patterns match implementation
+- **Authentication Flow**: Verify token/session management claims
+  - Check authentication method (JWT, cookies, OAuth) against implementation
+  - Verify token storage and transmission patterns
+  - Validate session management and refresh logic claims
+  - Confirm protected route handling implementation
+- **API Integration Patterns**: Verify async operation handling claims
+  - Check documented async patterns (Promises, Observables, async/await) match usage
+  - Verify loading states and error boundary documentation
+  - Validate caching strategies against implementation
+  - Confirm real-time data handling (WebSockets, SSE) if documented
+
+**For Backend Services**:
+- **Endpoints**: Verify complete REST API specification
+- **Authentication**: Verify JWT, OAuth, API keys implementation
+- **Data Models**: Verify request/response schemas match actual models
+- **Error Handling**: Verify HTTP status codes and error response formats
+- **Rate Limiting**: Verify API throttling implementation
+- **Versioning**: Verify API versioning strategy implementation
+
+**Red Flags**: Incorrect API patterns, wrong endpoint documentation, non-existent authentication flows, documented endpoints that don't exist in service files
 
 #### 2.2 State Management Verification
 **Check**: Is state management accurately described?
-- Examine services for BehaviorSubjects, state patterns
-- Verify component state management claims
-- Check for external state libraries (NgRx, Akita) vs service-based state
-- **Red Flags**: Claiming state libraries that don't exist, incorrect state patterns
+
+**For Frontend Applications**:
+- **State Management Architecture**: Verify state structure and management claims
+  - Check documented state management library (Redux, NgRx, Vuex, Zustand, Context API) against actual dependencies
+  - Verify global vs local state organization matches implementation
+  - Validate store structure and module/slice organization claims
+  - Confirm state initialization and default values documentation
+- **Store Documentation**: Verify detailed breakdown of stores
+  - Check documented store responsibilities match actual store implementations
+  - Verify state shape and data structures against actual store files
+  - Validate documented actions/mutations/methods exist in stores
+  - Confirm selectors/getters documentation matches implementation
+  - Verify async operation handling (effects, thunks, sagas) claims
+- **Data Flow Patterns**: Verify component-store interaction claims
+  - Check documented component to store communication patterns
+  - Verify store to store communication if documented
+  - Validate side effect management documentation (API calls, navigation)
+  - Confirm state update patterns and immutability rules
+  - Verify event handling and user interaction flow documentation
+- **Data Models**: Verify type definitions accuracy
+  - Check core entity interfaces and types exist
+  - Verify API response and request type definitions
+  - Validate component prop interfaces documentation
+  - Confirm store state type definitions match implementation
+- **Local Storage & Persistence**: Verify persistence claims
+  - Check what data is actually persisted locally (localStorage, sessionStorage, IndexedDB)
+  - Verify persistence strategies and lifecycle documentation
+  - Validate data hydration and rehydration patterns
+  - Confirm cache invalidation and cleanup implementation
+
+**For Backend Services**:
+- **Database Schema**: Verify core entities, relationships, and constraints
+- **Migration Strategy**: Verify schema change management implementation
+- **Data Access Patterns**: Verify ORM usage, query optimization, connection pooling
+- **Caching Strategy**: Verify Redis, in-memory caching, or other caching mechanisms
+- **Data Validation**: Verify server-side validation rules and business logic
+
+**Red Flags**: Claiming state libraries that don't exist, incorrect state patterns, documented stores that don't exist, wrong data flow descriptions, non-existent persistence mechanisms
 
 #### 2.3 Component Architecture Verification
 **Check**: Is component architecture accurately documented?
@@ -112,6 +228,12 @@ You are a senior software architect tasked with validating the accuracy of gener
 2. **Create a checklist of all factual claims made**
 3. **For each claim, verify against the actual codebase**
 4. **Document discrepancies with evidence**
+5. **Specific Enhanced Validation**:
+   - **API Claims**: Verify every documented endpoint exists in service files
+   - **State Management Claims**: Verify every documented store, action, and selector exists
+   - **Configuration Claims**: Verify every documented config file and environment variable exists and is used
+   - **Authentication Claims**: Verify documented auth flow matches actual implementation
+   - **Data Flow Claims**: Verify documented patterns match actual component-store interactions
 
 ### Step 2: Evidence Collection
 For each inaccuracy found:
@@ -128,20 +250,49 @@ Identify recurring types of inaccuracies:
 - Best practice documentation vs. what's implemented
 - Technology claims vs. actual dependencies
 - Command documentation vs. actual functionality
+- **API Documentation Patterns**:
+  - Documenting generic REST patterns vs. actual endpoint implementations
+  - Claiming authentication mechanisms not actually used
+  - Documenting API endpoints that don't exist in service files
+  - Incorrect HTTP method or URL pattern documentation
+- **State Management Patterns**:
+  - Claiming state management libraries not in dependencies
+  - Documenting stores or actions that don't exist
+  - Incorrect data flow pattern descriptions
+  - Wrong state structure or type definitions
+- **Configuration Documentation Patterns**:
+  - Documenting configuration files that don't exist
+  - Claiming environment variables not read by the application
+  - Incorrect required vs optional configuration classification
+  - Missing configuration validation or error handling documentation
 
-### Step 4: Correction Generation
+### Step 4: Correction Generation & Composite Context Application
 
-#### 4.1 Documentation Corrections
-For each inaccuracy, provide:
-- **Corrected text** to replace the inaccurate content
-- **Evidence** supporting the correction
-- **Context** on why the original was wrong
+#### 4.1 Project-Specific Learning Creation
+Create `.cursor/learning/workflow-learnings.md` with:
+- **Technology-Specific Validation Rules**: Rules discovered for this project type
+- **Common Inaccuracy Patterns**: Patterns specific to this technology stack
+- **Validation Insights**: Technology-specific validation approaches that worked
+- **Execution Metrics**: Accuracy rates, common issues, successful patterns
 
-#### 4.2 Generation Prompt Improvements
-For each pattern of inaccuracy, suggest:
-- **Specific validation steps** to add to the generation prompt
-- **Warning phrases** to include about common false assumptions
-- **Verification requirements** before documenting features
+#### 4.2 Documentation Corrections Using Composite Context
+For each inaccuracy, provide corrected documentation using:
+- **Generic Principles**: From the documentation generation prompt
+- **Project-Specific Learnings**: From the validation insights just created
+- **Evidence-Based Corrections**: Supported by actual code evidence
+
+#### 4.3 Final Documentation Update
+Generate corrected `docs/PROJECT_DOCUMENTATION.md` that:
+- **Incorporates All Corrections**: Based on validation findings
+- **Maintains Generic Structure**: Follows the original documentation format
+- **Includes Project-Specific Accuracy**: Uses composite context for precision
+- **Preserves Reusability**: Keeps technology-agnostic approach where possible
+
+#### 4.4 Learning File Enhancement
+Update `.cursor/learning/workflow-learnings.md` with:
+- **Execution Results**: Final accuracy metrics and success patterns
+- **Technology-Specific Insights**: Validation rules for this project type
+- **Future Validation Guidance**: Patterns to watch for in similar projects
 
 ## Output Format
 
@@ -153,6 +304,7 @@ For each pattern of inaccuracy, suggest:
 - Total claims verified: [number]
 - Inaccuracies found: [number]
 - Severity: [Critical/Major/Minor]
+- Final accuracy achieved: [percentage]
 
 ## Critical Issues
 [List issues that would prevent successful project setup]
@@ -165,13 +317,36 @@ For each pattern of inaccuracy, suggest:
 
 ## Pattern Analysis
 [Common types of inaccuracies and their root causes]
+
+## Corrections Applied
+[Summary of corrections made using composite context]
 ```
 
-### Documentation Corrections
+### Corrected Documentation
 ```markdown
 # Corrected Documentation
 
-[Provide the corrected sections with explanations]
+[Complete corrected PROJECT_DOCUMENTATION.md with all inaccuracies fixed using composite context]
+```
+
+### Project-Specific Learning File
+```markdown
+# Project-Specific Workflow Learnings
+
+## Technology Stack
+[Technology-specific validation rules for this project type]
+
+## Validation Insights
+[What worked well for validating this type of project]
+
+## Common Inaccuracy Patterns
+[Patterns specific to this technology stack]
+
+## Execution Metrics
+[Accuracy rates, validation success patterns, timing]
+
+## Future Validation Guidance
+[Recommendations for similar projects]
 ```
 
 ### Generation Prompt Improvements
@@ -196,6 +371,22 @@ Before completing validation:
 - [ ] No testing documentation exists without actual test files
 - [ ] Routing strategy matches actual implementation
 - [ ] Environment configuration claims match reality
+- [ ] Configuration management documentation is complete and accurate
+  - [ ] All documented configuration files exist
+  - [ ] Required vs optional configuration classification is correct
+  - [ ] Environment variables are actually read by the application
+  - [ ] Configuration validation and error handling claims are accurate
+- [ ] API integration documentation is comprehensive and accurate
+  - [ ] API endpoints inventory matches actual service implementations
+  - [ ] Service architecture descriptions match actual file organization
+  - [ ] Authentication flow documentation matches implementation
+  - [ ] API integration patterns match actual async operation handling
+- [ ] State management documentation is detailed and accurate
+  - [ ] State management library claims match actual dependencies
+  - [ ] Store documentation matches actual store implementations
+  - [ ] Data flow patterns match actual component-store interactions
+  - [ ] Data models and type definitions exist as documented
+  - [ ] Persistence mechanisms match actual implementation
 - [ ] All commands have been verified as functional
 - [ ] Technology stack claims match package.json
 - [ ] File structure documentation matches actual project
@@ -204,4 +395,12 @@ Before completing validation:
 
 ## Validation Execution
 
-Execute this validation process thoroughly and provide detailed findings with specific evidence for each inaccuracy discovered. Focus on accuracy that impacts developer productivity and onboarding success. 
+Execute this integrated validation and correction process thoroughly:
+
+1. **Validate** every factual claim in the documentation against the source code
+2. **Create** project-specific learning file with technology-specific insights
+3. **Apply corrections** using composite context (generic + project-specific learnings)
+4. **Generate** corrected documentation with validated accuracy
+5. **Enhance** learning file with execution results and patterns
+
+Focus on accuracy that impacts developer productivity and onboarding success while building reusable technology-specific validation insights for future projects. 
